@@ -19,7 +19,7 @@ module.exports.createCard = (req, res) => {
     .then(card => res.send({ data: card }))
     .catch(error => {
       if(error.name === 'ValidationError') {
-        ERROR_400(res, 'Переданы некорректные данные!');
+        ERROR_400(res, 'Переданы некорректные данные при создании карточки');
       }
       ERROR_500(res, 'Произошла ошибка!');
     });
@@ -35,7 +35,7 @@ module.exports.removeCard = (req, res) => {
     })
     .catch(error => {
       if(error.name === 'CastError') {
-        ERROR_404(res, 'Карточка с таким id не найдена');
+        ERROR_404(res, 'Карточка с указанным _id не найдена');
       }
       ERROR_500(res, 'Произошла ошибка!');
     });
@@ -48,7 +48,7 @@ module.exports.likeCard = (req, res) => {
     { new: true })
       .then(card => {
         if(!card) {
-          ERROR_404(res, 'Карточка не найдена');
+          ERROR_400(res, 'Переданы некорректные данные для постановки лайка');
         }
         res.send({ data: card });
       })
@@ -67,7 +67,7 @@ module.exports.dislikeCard = (req, res) => {
     { new: true })
       .then(card => {
         if(!card) {
-          ERROR_404(res, 'Карточка не найдена');
+          ERROR_400(res, 'Переданы некорректные данные для снятия лайка');
         }
         res.send({ data: card });
       })
