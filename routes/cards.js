@@ -1,11 +1,12 @@
 const { Router } = require('express');
+
 const router = Router();
 const {
   getCards,
   createCard,
   removeCard,
   likeCard,
-  dislikeCard
+  dislikeCard,
 } = require('../controllers/cards');
 
 router.get('/cards', getCards);
