@@ -6,6 +6,22 @@ const ERROR_400 = (res, message) => {
     .send({ message });
 };
 
+const ERROR_401 = (res, message) => {
+  const ERROR_CODE_401 = 401;
+
+  return res
+    .status(ERROR_CODE_401)
+    .send({ message });
+};
+
+const ERROR_403 = (res, message) => {
+  const ERROR_CODE_403 = 403;
+
+  return res
+    .status(ERROR_CODE_403)
+    .send({ message });
+};
+
 const ERROR_404 = (res, message) => {
   const ERROR_CODE_404 = 404;
 
@@ -22,4 +38,10 @@ const ERROR_500 = (res, message) => {
     .send({ message });
 };
 
-module.exports = { ERROR_400, ERROR_404, ERROR_500 };
+module.exports = {
+  ERROR_400,
+  ERROR_401,
+  ERROR_403,
+  ERROR_404,
+  ERROR_500,
+};
