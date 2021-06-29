@@ -5,10 +5,10 @@ const {
   ERROR_500,
 } = require('../utils/errors');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send({ data: cards }))
-    .catch(() => ERROR_500(res, 'Произошла ошибка!'));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res) => {
@@ -20,7 +20,7 @@ module.exports.createCard = (req, res) => {
       if (error.name === 'ValidationError') {
         return ERROR_400(res, 'Переданы некорректные данные при создании карточки');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };
 
@@ -36,7 +36,7 @@ module.exports.removeCard = (req, res) => {
       if (error.name === 'CastError') {
         return ERROR_404(res, 'Карточка с указанным _id не найдена');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };
 
@@ -56,7 +56,7 @@ module.exports.likeCard = (req, res) => {
       if (error.name === 'CastError') {
         return ERROR_404(res, 'Карточка не найдена');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };
 
@@ -76,6 +76,6 @@ module.exports.dislikeCard = (req, res) => {
       if (error.name === 'CastError') {
         return ERROR_404(res, 'Карточка не найдена');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };

@@ -6,27 +6,14 @@ const {
   ERROR_400,
   ERROR_401,
   ERROR_404,
+  ERROR_409,
   ERROR_500,
 } = require('../utils/errors');
 
 module.exports.login = (req, res) => {
   const { email, password } = req.body;
 
-  User.findOne({ email }).select('+password')
-    .then((user) => {
-      if (!user) {
-        return ERROR_401(res, 'Не правильная почта или пароль');
-      }
-      return bcrypt.compare(password, user.password)
-        .then((matched) => {
-          if (!matched) {
-            return ERROR_401(res, 'Не правильная почта или пароль');
-          }
-          res.send({ message: 'Успешно!' });
-
-          return user;
-        });
-    })
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign(
         { _id: user._id },
@@ -36,16 +23,16 @@ module.exports.login = (req, res) => {
 
       res.send({ token });
     })
-    .catch(() => ERROR_500(res, 'Произошла ошибка!'));
+    .catch(() => ERROR_401(res, 'Неправильные почта или пароль'));
 };
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((users) => res.send({ data: users }))
-    .catch(() => ERROR_500(res, 'Произошла ошибка!'));
+    .catch(next);
 };
 
-module.exports.getUser = (req, res) => {
+module.exports.getUser = (req, res, next) => {
   User.findById(req.params.userId)
     .then((user) => {
       if (!user) {
@@ -53,10 +40,10 @@ module.exports.getUser = (req, res) => {
       }
       return res.send({ data: user });
     })
-    .catch(() => ERROR_500(res, 'Произошла ошибка!'));
+    .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res) => {
+module.exports.getCurrentUser = (req, res, next) => {
   User.findById(req.user._id)
     .then((user) => {
       if (!user) {
@@ -64,7 +51,7 @@ module.exports.getCurrentUser = (req, res) => {
       }
       return res.send({ data: user });
     })
-    .catch(() => ERROR_500(res, 'Произошла ошибка!'));
+    .catch(next);
 };
 
 module.exports.createUser = (req, res) => {
@@ -87,9 +74,12 @@ module.exports.createUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((error) => {
       if (error.name === 'ValidationError') {
-        return ERROR_400(res, 'Переданы некорректные данные при создании пользователя');
+        return ERROR_400(res, 'Переданы некорректные данные при регистрации пользователя');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      if (error.name === 'MongoError' && error.code === 11000) {
+        return ERROR_409(res, 'Пользователь с таким email уже зарегистрирован');
+      }
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };
 
@@ -114,7 +104,7 @@ module.exports.updateUserProfile = (req, res) => {
       if (error.name === 'ValidationError') {
         return ERROR_400(res, 'Переданы некорректные данные при обновлении профиля');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };
 
@@ -139,6 +129,6 @@ module.exports.updateUserAvatar = (req, res) => {
       if (error.name === 'ValidationError') {
         return ERROR_400(res, 'Переданы некорректные данные при обновлении аватара');
       }
-      return ERROR_500(res, 'Произошла ошибка!');
+      return ERROR_500(res, 'На сервере произошла ошибка');
     });
 };

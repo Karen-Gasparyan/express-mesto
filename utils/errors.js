@@ -30,6 +30,14 @@ const ERROR_404 = (res, message) => {
     .send({ message });
 };
 
+const ERROR_409 = (res, message) => {
+  const ERROR_CODE_409 = 409;
+
+  return res
+    .status(ERROR_CODE_409)
+    .send({ message });
+};
+
 const ERROR_500 = (res, message) => {
   const ERROR_CODE_500 = 500;
 
@@ -43,5 +51,6 @@ module.exports = {
   ERROR_401,
   ERROR_403,
   ERROR_404,
+  ERROR_409,
   ERROR_500,
 };
