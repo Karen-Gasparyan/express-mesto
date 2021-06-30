@@ -25,12 +25,21 @@ module.exports.createCard = (req, res) => {
 };
 
 module.exports.removeCard = (req, res) => {
-  Card.findByIdAndRemove(req.params.cardId)
+  Card.findOne({ _id: req.params.cardId })
     .then((card) => {
       if (!card) {
         return ERROR_404(res, 'Карточка с указанным _id не найдена');
       }
-      return res.send({ data: card });
+      return card;
+    })
+    .then((foundCard) => {
+      if (foundCard.owner.toString() === req.user._id) {
+        return Card.findByIdAndRemove(req.params.cardId)
+          .then((remoteCard) => {
+            res.send({ data: remoteCard });
+          });
+      }
+      return Promise.reject();
     })
     .catch((error) => {
       if (error.name === 'CastError') {
