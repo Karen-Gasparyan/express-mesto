@@ -27,22 +27,25 @@ app.post('/signin', login);
 
 app.post('/signup', createUser);
 
-app.use(auth);
+app.use('/', auth, require('./routes/users'));
 
-app.use('/', require('./routes/users'));
-
-app.use('/', require('./routes/cards'));
+app.use('/', auth, require('./routes/cards'));
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Нет ответа на данный запрос' });
 });
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
+app.use((error, req, res, next) => {
+  const { statusCode = 500, message } = error;
 
   res
     .status(statusCode)
-    .send({ message: statusCode === 500 ? 'На сервере произошла ошибка' : message });
+    .send({
+      message: statusCode === 500
+        ? 'На сервере произошла ошибка'
+        : message,
+    });
+
   next();
 });
 
