@@ -1,7 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/user');
 
+const { JWT_SECRET_KEY = 'super-secret-key' } = process.env;
+const User = require('../models/user');
 const Unauthorized = require('../errors/unauthorized-error');
 const NotFoundError = require('../errors/not-found-error');
 const BadRequest = require('../errors/bad-request-error');
@@ -17,7 +18,7 @@ module.exports.login = (req, res, next) => {
       }
       const token = jwt.sign(
         { _id: user._id },
-        'super-strong-secret',
+        JWT_SECRET_KEY,
         { expiresIn: '7d' },
       );
 
@@ -73,7 +74,9 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
+    .then(({ name, about, avatar, email }) => {
+      res.send({ data: { name, about, avatar, email } });
+    })
     .catch((error) => {
       if (error.name === 'ValidationError') {
         next(new BadRequest('Переданы некорректные данные при регистрации пользователя'));

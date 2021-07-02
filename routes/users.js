@@ -1,4 +1,5 @@
 const { Router } = require('express');
+const { celebrate, Joi } = require('celebrate');
 
 const router = Router();
 const {
@@ -10,9 +11,27 @@ const {
 } = require('../controllers/users');
 
 router.get('/users', getUsers);
+
 router.get('/users/me', getCurrentUser);
-router.get('/users/:userId', getUser);
-router.patch('/users/me', updateUserProfile);
-router.patch('/users/me/avatar', updateUserAvatar);
+
+router.get('/users/:userId', celebrate({
+  params: Joi.object().keys({
+    userId: Joi.string().alphanum(),
+  }),
+}), getUser);
+
+router.patch('/users/me', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    about: Joi.string().required().min(2).max(30),
+  }),
+}), updateUserProfile);
+
+router.patch('/users/me/avatar', celebrate({
+  body: Joi.object().keys({
+    avatar: Joi.string().required()
+      .regex(/(ftp|http|https):\/\/(\w+:{0,1}\w*@)?(\S+)(:[0-9]+)?(\/|\/([\w#!:.?+=&%@!\-/]))?/),
+  }),
+}), updateUserAvatar);
 
 module.exports = router;

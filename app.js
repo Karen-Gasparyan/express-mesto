@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const { celebrate, Joi, errors } = require('celebrate');
 
 const {
   login,
@@ -23,9 +24,27 @@ app.use(bodyParser.json());
 
 app.use(bodyParser.urlencoded({ extended: true }));
 
-app.post('/signin', login);
+app.post('/signin', celebrate({
+  body: Joi.object().keys({
+    email: Joi.string().required().email().min(5),
+    password: Joi.string().required().min(8),
+  }),
+}), login);
 
-app.post('/signup', createUser);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    email: Joi.string().required().email().min(5),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
+
+app.use(celebrate({
+  headers: Joi.object({
+    authorization: Joi.string().required(),
+  }).unknown(),
+}));
 
 app.use('/', auth, require('./routes/users'));
 
@@ -34,6 +53,8 @@ app.use('/', auth, require('./routes/cards'));
 app.use((req, res) => {
   res.status(404).send({ message: 'Нет ответа на данный запрос' });
 });
+
+app.use(errors());
 
 app.use((error, req, res, next) => {
   const { statusCode = 500, message } = error;
