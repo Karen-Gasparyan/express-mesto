@@ -1,7 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
-const { JWT_SECRET_KEY = 'super-secret-key' } = process.env;
+const { JWT_SECRET_KEY } = require('../config');
 const User = require('../models/user');
 const Unauthorized = require('../errors/unauthorized-error');
 const NotFoundError = require('../errors/not-found-error');
@@ -11,7 +11,7 @@ const Conflict = require('../errors/conflict-error');
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
-  return User.findUserByCredentials(email, password) // ???
+  return User.findUserByCredentials(email, password)
     .then((user) => {
       if (!user) {
         throw new Unauthorized('Неправильные почта или пароль');

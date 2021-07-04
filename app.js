@@ -3,14 +3,12 @@ const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
-const {
-  login,
-  createUser,
-} = require('./controllers/users');
-
+const { PORT, IMAGE_REGEX } = require('./config');
+const { login, createUser } = require('./controllers/users');
+const NotFoundError = require('./errors/not-found-error');
 const auth = require('./middlewares/auth');
+const errorHandler = require('./middlewares/errorHandler');
 
-const { PORT = 3000 } = process.env;
 const app = express();
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
@@ -21,7 +19,6 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 });
 
 app.use(bodyParser.json());
-
 app.use(bodyParser.urlencoded({ extended: true }));
 
 app.post('/signin', celebrate({
@@ -35,6 +32,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
+    avatar: Joi.string().regex(IMAGE_REGEX),
     email: Joi.string().required().email().min(5),
     password: Joi.string().required().min(8),
   }),
@@ -47,28 +45,14 @@ app.use(celebrate({
 }));
 
 app.use('/', auth, require('./routes/users'));
-
 app.use('/', auth, require('./routes/cards'));
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Нет ответа на данный запрос' });
+app.use(() => {
+  throw new NotFoundError('Нет ответа на данный запрос');
 });
 
 app.use(errors());
-
-app.use((error, req, res, next) => {
-  const { statusCode = 500, message } = error;
-
-  res
-    .status(statusCode)
-    .send({
-      message: statusCode === 500
-        ? 'На сервере произошла ошибка'
-        : message,
-    });
-
-  next();
-});
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
