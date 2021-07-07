@@ -8,6 +8,7 @@ const { login, createUser } = require('./controllers/users');
 const NotFoundError = require('./errors/not-found-error');
 const auth = require('./middlewares/auth');
 const errorHandler = require('./middlewares/errorHandler');
+const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
@@ -20,6 +21,8 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(requestLogger); // логгер запросов
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -50,6 +53,8 @@ app.use('/', auth, require('./routes/cards'));
 app.use(() => {
   throw new NotFoundError('Нет ответа на данный запрос');
 });
+
+app.use(errorLogger); // логгер ошибок
 
 app.use(errors());
 app.use(errorHandler);

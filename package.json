@@ -4,7 +4,7 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
     "lint": "npx eslint .",
     "start": "node app.js",
     "dev": "nodemon app.js"
@@ -24,14 +24,18 @@
     "body-parser": "^1.19.0",
     "celebrate": "^14.0.0",
     "express": "^4.17.1",
+    "express-winston": "^4.1.0",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.12.14",
-    "validator": "^13.6.0"
+    "validator": "^13.6.0",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "eslint": "^7.29.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.23.4",
-    "nodemon": "^2.0.7"
+    "jest": "^27.0.6",
+    "nodemon": "^2.0.7",
+    "supertest": "^6.1.3"
   }
 }
