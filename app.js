@@ -14,7 +14,7 @@ const app = express();
 
 app.use((req, res, next) => {
   const { method } = req;
-  const requestHeaders = req.headers['access-control-request-headers'];
+  const requestHeaders = req.headers['*'];
 
   res.header('Access-Control-Allow-Origin', '*');
 
