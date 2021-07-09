@@ -14,7 +14,7 @@ const app = express();
 
 app.use((req, res, next) => {
   const { method } = req;
-  const requestHeaders = req.headers['Content-Type'];
+  // const requestHeaders = req.headers['access-control-request-headers'];
 
   res.header('Access-Control-Allow-Origin', '*');
 
@@ -23,7 +23,10 @@ app.use((req, res, next) => {
       'Access-Control-Allow-Methods',
       'GET, HEAD, PUT, PATCH, POST, DELETE',
     );
-    res.header('Access-Control-Allow-Headers', requestHeaders);
+    res.header(
+      'Access-Control-Allow-Headers',
+      'Origin, X-Requested-With, Content-Type, Accept',
+    );
   }
 
   next();
