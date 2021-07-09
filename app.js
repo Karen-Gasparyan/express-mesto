@@ -13,22 +13,27 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
-app.use(cors());
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 200,
+};
 
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
+app.use(cors(corsOptions));
 
-  res.header(
-    'Access-Control-Allow-Headers',
-    'Origin, X-Requested-With, Content-Type, Accept',
-  );
-  res.header(
-    'Access-Control-Allow-Methods',
-    'GET,HEAD,PUT,PATCH,POST,DELETE',
-  );
+// app.use((req, res, next) => {
+//   res.header('Access-Control-Allow-Origin', '*');
 
-  next();
-});
+//   res.header(
+//     'Access-Control-Allow-Headers',
+//     'Origin, X-Requested-With, Content-Type, Accept',
+//   );
+//   res.header(
+//     'Access-Control-Allow-Methods',
+//     'GET,HEAD,PUT,PATCH,POST,DELETE',
+//   );
+
+//   next();
+// });
 
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
