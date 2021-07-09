@@ -13,20 +13,16 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 const app = express();
 
 app.use((req, res, next) => {
-  const { method } = req;
-
   res.header('Access-Control-Allow-Origin', '*');
 
-  if (method === 'OPTIONS') {
-    res.header(
-      'Access-Control-Allow-Headers',
-      'Origin, X-Requested-With, Content-Type, Accept',
-    );
-    res.header(
-      'Access-Control-Allow-Methods',
-      'GET, HEAD, PUT, PATCH, POST, DELETE',
-    );
-  }
+  res.header(
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept',
+  );
+  res.header(
+    'Access-Control-Allow-Methods',
+    'GET,HEAD,PUT,PATCH,POST,DELETE',
+  );
 
   next();
 });
