@@ -1,5 +1,5 @@
 const express = require('express');
-const mongoose = require('mongoose');
+// const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
 
@@ -12,18 +12,6 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
-mongoose.connect('mongodb://localhost:27017/mestodb', {
-  useUnifiedTopology: true,
-  useNewUrlParser: true,
-  useCreateIndex: true,
-  useFindAndModify: false,
-});
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
-app.use(requestLogger); // логгер запросов
-
 app.use((req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
 
@@ -35,6 +23,18 @@ app.use((req, res, next) => {
 
   next();
 });
+
+// mongoose.connect('mongodb://localhost:27017/mestodb', {
+//   useUnifiedTopology: true,
+//   useNewUrlParser: true,
+//   useCreateIndex: true,
+//   useFindAndModify: false,
+// });
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
+app.use(requestLogger);
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
@@ -66,7 +66,7 @@ app.use(() => {
   throw new NotFoundError('Нет ответа на данный запрос');
 });
 
-app.use(errorLogger); // логгер ошибок
+app.use(errorLogger);
 
 app.use(errors());
 app.use(errorHandler);
