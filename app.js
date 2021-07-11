@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const { celebrate, Joi, errors } = require('celebrate');
+const cors = require('cors');
 
 const { PORT, IMAGE_REGEX } = require('./config');
 const { login, createUser } = require('./controllers/users');
@@ -12,6 +13,34 @@ const { requestLogger, errorLogger } = require('./middlewares/logger');
 
 const app = express();
 
+app.use((req, res, next) => {
+  const allowedCors = [
+    'http://localhost:5000/signup',
+    'http://localhost:3000',
+    'http://localhost:3000/',
+    '*',
+  ];
+
+  const { origin } = req.headers;
+
+  if (allowedCors.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+  }
+
+  if (req.method === 'OPTIONS') {
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    // res.header('Access-Control-Allow-Credentials', true);
+    console.log('===>');
+  }
+
+  next();
+});
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+
 mongoose.connect('mongodb://localhost:27017/mestodb', {
   useUnifiedTopology: true,
   useNewUrlParser: true,
@@ -19,18 +48,7 @@ mongoose.connect('mongodb://localhost:27017/mestodb', {
   useFindAndModify: false,
 });
 
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-
 app.use(requestLogger);
-
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', '*');
-  res.header('Access-Control-Allow-Methods', '*');
-
-  next();
-});
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
