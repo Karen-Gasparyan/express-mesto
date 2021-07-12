@@ -16,6 +16,8 @@ module.exports = ((req, res, next) => {
       res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
       res.header('Access-Control-Allow-Credentials', true);
       res.status(204).send();
-    } else next();
-  } else next();
+    }
+  }
+
+  next();
 });
