@@ -1,7 +1,8 @@
 module.exports = ((req, res, next) => {
   const allowedCors = [
     'https://yp.gks.mesto.nomoredomains.club',
-    'http://yp.gks.mesto.nomoredomains.club',
+    'https://yp.gks.mesto.nomoredomains.club/signin',
+    'https://yp.gks.mesto.nomoredomains.club/signup',
   ];
 
   const { origin } = req.headers;
